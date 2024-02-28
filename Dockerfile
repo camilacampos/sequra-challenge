@@ -1,59 +1,43 @@
-# syntax = docker/dockerfile:1
+FROM ruby:3.2.1-slim as builder
 
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.2.1
-FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN apt-get update && apt-get install wget -y --no-install-recommends\
+    && wget -qO- https://deb.nodesource.com/setup_16.x | bash - \
+    && wget -qO- https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists
 
-# Rails app lives here
-WORKDIR /rails
+RUN apt-get update \
+    && apt-get install -qq -y --no-install-recommends \
+    build-essential \
+    gpg \
+    gpg-agent \
+    libpq-dev \
+    postgresql-client-13 \
+    nodejs \
+    yarn \
+    git \
+    nodejs \
+    cmake \
+    pkg-config \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists
 
-# Set production environment
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+# ------------------------------------------------------------------------------
 
+RUN mkdir /app
+WORKDIR /app
 
-# Throw-away build stage to reduce size of final image
-FROM base as build
+ARG BUNDLE_GITHUB__COM
+ENV BUNDLE_GITHUB__COM $BUNDLE_GITHUB__COM
 
-# Install packages needed to build gems
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips pkg-config
+RUN gem install bundler:2.4.5
 
-# Install application gems
-COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    bundle exec bootsnap precompile --gemfile
+COPY Gemfile Gemfile.lock /app/
 
-# Copy application code
-COPY . .
+RUN bundle install -j "$(nproc)"
+COPY . /app
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
-
-
-# Final stage for app image
-FROM base
-
-# Install packages needed for deployment
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libvips postgresql-client && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Copy built artifacts: gems, application
-COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /rails /rails
-
-# Run and own only the runtime files as a non-root user for security
-RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER rails:rails
-
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-
-# Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-CMD ["./bin/rails", "server"]
+EXPOSE 7777
+ENTRYPOINT ["sh", "init.sh"]

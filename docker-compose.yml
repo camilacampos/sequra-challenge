@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        BUNDLE_GITHUB__COM: $GITHUB_TOKEN
+    stdin_open: true
+    tty: true
+    command: web
+    volumes:
+      - .:/app
+      - bundle_path:/bundle
+    environment:
+      RAILS_ENV: ${RAILS_ENV:-development}
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: ''
+      DATABASE_HOST: db
+      SIDEKIQ_USERNAME: $SIDEKIQ_USERNAME
+      SIDEKIQ_PASSWORD: $SIDEKIQ_PASSWORD
+      BUNDLE_PATH: /bundle/vendor
+    ports:
+      - '7777:7777'
+    networks:
+      default:
+      sequra:
+        aliases:
+          - sequra_challenge
+    depends_on:
+      - db
+      - sidekiq
+      - redis
+
+  sidekiq:
+    build:
+      context: .
+      args:
+        BUNDLE_GITHUB__COM: $GITHUB_TOKEN
+    stdin_open: true
+    tty: true
+    command: sidekiq
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: ${RAILS_ENV:-development}
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: ''
+      DATABASE_HOST: db
+      BUNDLE_PATH: /bundle/vendor
+
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+      - bundle_path:/bundle
+
+
+  db:
+    hostname: postgres
+    image: postgres:13.2
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ''
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: "sequra_challenge_development"
+    ports:
+      - '7771:5432'
+    volumes:
+      - postgres:/var/lib/postgresql
+
+  redis:
+    hostname: redis
+    image: redis:6.2
+    ports:
+      - '7772:6379'
+    volumes:
+      - redis:/var/lib/redis
+
+volumes:
+  postgres:
+  redis:
+  bundle_path:
+
+networks:
+  sequra:
+    external: true
