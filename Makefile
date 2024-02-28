@@ -25,6 +25,9 @@ rebuild: down build run
 test:
 	docker-compose exec -e "RAILS_ENV=test" app rspec $(filter-out $@,$(MAKECMDGOALS))
 
+test-failures:
+	docker-compose exec -e "RAILS_ENV=test" app rspec --only-failures
+
 rake:
 	docker-compose exec -e "RAILS_ENV=development" app bundle exec rake $(filter-out $@,$(MAKECMDGOALS))
 
