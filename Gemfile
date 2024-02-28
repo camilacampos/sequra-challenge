@@ -37,6 +37,10 @@ gem "bootsnap", require: false
 
 gem "dotenv", "~> 3.1"
 
+gem "redis", "~> 5.1"
+gem "sidekiq", "~> 7.2"
+gem "sidekiq-scheduler", "~> 5.0"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows]
@@ -47,6 +51,7 @@ end
 
 group :test do
   gem "factory_bot_rails", "~> 6.4"
+  gem "rspec-sidekiq", "~> 4.1"
 end
 
 group :development do
