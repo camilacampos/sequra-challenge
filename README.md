@@ -37,3 +37,7 @@ make test-failures # run only previously failed tests
 make lint # run lint
 make lint-fix # run lint and automatically fix issues
 ```
+
+## Challenge description
+
+Refer to [challenge_description.md](challenge_description.md)
