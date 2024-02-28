@@ -45,6 +45,10 @@ group :development, :test do
   gem "standard", "~> 1.34"
 end
 
+group :test do
+  gem "factory_bot_rails", "~> 6.4"
+end
+
 group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
