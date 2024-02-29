@@ -10,10 +10,46 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_29_000554) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_29_031757) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
+
+  create_table "commissions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "order_id", null: false
+    t.uuid "disbursement_id", null: false
+    t.integer "order_amount_cents", default: 0, null: false
+    t.string "order_amount_currency", default: "EUR", null: false
+    t.float "fee_percentage", null: false
+    t.integer "fee_value_cents", default: 0, null: false
+    t.string "fee_value_currency", default: "EUR", null: false
+    t.integer "disbursed_amount_cents", default: 0, null: false
+    t.string "disbursed_amount_currency", default: "EUR", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["disbursement_id"], name: "index_commissions_on_disbursement_id"
+    t.index ["order_id"], name: "index_commissions_on_order_id"
+  end
+
+  create_table "disbursements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "merchant_id", null: false
+    t.string "reference", null: false
+    t.string "status", null: false
+    t.integer "total_commission_fee_cents", default: 0, null: false
+    t.string "total_commission_fee_currency", default: "EUR", null: false
+    t.integer "total_amount_cents", default: 0, null: false
+    t.string "total_amount_currency", default: "EUR", null: false
+    t.integer "disbursed_amount_cents", default: 0, null: false
+    t.string "disbursed_amount_currency", default: "EUR", null: false
+    t.integer "monthly_fee_cents"
+    t.string "monthly_fee_currency"
+    t.string "frequency", null: false
+    t.date "reference_date", null: false
+    t.datetime "calculated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["merchant_id"], name: "index_disbursements_on_merchant_id"
+  end
 
   create_table "merchants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "reference", null: false
@@ -39,5 +75,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_29_000554) do
     t.index ["reference"], name: "index_orders_on_reference", unique: true
   end
 
+  add_foreign_key "commissions", "disbursements"
+  add_foreign_key "commissions", "orders"
+  add_foreign_key "disbursements", "merchants"
   add_foreign_key "orders", "merchants"
 end

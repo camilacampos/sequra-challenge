@@ -49,6 +49,10 @@ task create_merchants: :environment do
   puts "Total merchants created: #{created}"
   puts "Total already existing merchants: #{existing}"
 
-  puts "\n\n#{errors.count} errors:"
-  puts errors.join("\n")
+  if errors.any?
+    puts "\n\n#{errors.count} errors:"
+    puts errors.join("\n")
+  else
+    puts "\n\nNo errors"
+  end
 end

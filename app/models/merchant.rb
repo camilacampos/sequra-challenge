@@ -2,7 +2,7 @@ class Merchant < ApplicationRecord
   attribute :reference, :string
   attribute :email, :string
   attribute :live_on, :date
-  enum :disbursement_frequency, ::Enum::DisbursementFrequencies.to_h
+  enum :disbursement_frequency, ::Enum::DisbursementFrequencies.to_h, scopes: false
   monetize :minimum_monthly_fee_cents
 
   has_many :orders
