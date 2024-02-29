@@ -9,12 +9,15 @@ class Disbursement < ApplicationRecord
   enum :status, ::Enum::DisbursementStatuses.to_h, default: ::Enum::DisbursementStatuses::PENDING
 
   # Total amount of commission fees that the merchant has to pay
+  # Sum of all commissions fee values
   monetize :total_commission_fee_cents
 
   # Total amount of money that the merchant selled on their orders
+  # Sum of all orders amount
   monetize :total_amount_cents
 
-  # Total amount of money that the merchant will receive
+  # Total amount of money that the merchant will receive (total_amount - total_commission_fee)
+  # Sum of all commissions disbursed amount
   monetize :disbursed_amount_cents
 
   # Monthly fee that the merchant has to pay if minimun_monthly_fee is not reached
@@ -33,7 +36,9 @@ class Disbursement < ApplicationRecord
   attribute :calculated_at, :datetime
 
   belongs_to :merchant
+  has_many :commissions
 
   validates :merchant, :reference, :status, :frequency, :reference_date, presence: true
+  validates :calculated_at, presence: true, if: -> { calculated? }
   validates_uniqueness_of :reference
 end
