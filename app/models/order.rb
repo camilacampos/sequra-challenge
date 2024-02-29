@@ -4,5 +4,5 @@ class Order < ApplicationRecord
 
   belongs_to :merchant
 
-  validates_uniqueness_of :reference
+  validates :reference, presence: true, uniqueness: true
 end
