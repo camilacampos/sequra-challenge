@@ -70,8 +70,5 @@ bundle-install:
 bundle-update:
 	docker-compose run --rm app bundle update
 
-bundle-add:
-	docker-compose run --rm app bundle add $(filter-out $@,$(MAKECMDGOALS))
-
 psql: up
 	psql postgres://root@localhost:7771/sequra_challenge_development
