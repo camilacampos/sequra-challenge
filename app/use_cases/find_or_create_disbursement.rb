@@ -6,13 +6,10 @@ class FindOrCreateDisbursement
   private
 
   def find_disbursement(order)
-    if order.merchant.daily?
-      Disbursement.find_by(merchant: order.merchant, reference_date: order.created_at.to_date)
-    else
-      reference_date = reference_date_from(order)
+    reference_date = order.created_at.to_date
+    reference_date = reference_date_from(order) if order.merchant.weekly?
 
-      Disbursement.find_by(merchant: order.merchant, reference_date:)
-    end
+    Disbursement.pending_or_processing.find_by(merchant: order.merchant, reference_date:)
   end
 
   def create_disbursement(order)

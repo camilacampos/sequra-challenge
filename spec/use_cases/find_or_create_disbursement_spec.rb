@@ -3,13 +3,66 @@ require "rails_helper"
 RSpec.describe ::FindOrCreateDisbursement do
   include ActiveSupport::Testing::TimeHelpers
 
+  context "when disbursement exists" do
+    context "when existing disbursement is pending" do
+      it "uses found disbursement" do
+        merchant = create(:merchant, :daily)
+        created_at = Date.parse("2024-02-02")
+        order = create(:order, merchant:, created_at:)
+        disbursement = create(:disbursement, :pending, merchant:, reference_date: order.created_at.to_date)
+
+        found_disbursement = nil
+
+        expect {
+          found_disbursement = described_class.new.call(order)
+        }.not_to change(Disbursement, :count)
+
+        expect(found_disbursement).to eq disbursement
+      end
+    end
+
+    context "when existing disbursement is processing" do
+      it "uses found disbursement" do
+        merchant = create(:merchant, :daily)
+        created_at = Date.parse("2024-02-02")
+        order = create(:order, merchant:, created_at:)
+        disbursement = create(:disbursement, :processing, merchant:, reference_date: order.created_at.to_date)
+
+        found_disbursement = nil
+
+        expect {
+          found_disbursement = described_class.new.call(order)
+        }.not_to change(Disbursement, :count)
+
+        expect(found_disbursement).to eq disbursement
+      end
+    end
+
+    context "when existing disbursement is calculated" do
+      it "creates new disbursement" do
+        merchant = create(:merchant, :daily)
+        created_at = Date.parse("2024-02-02")
+        order = create(:order, merchant:, created_at:)
+        disbursement = create(:disbursement, :calculated, merchant:, reference_date: order.created_at.to_date)
+
+        found_disbursement = nil
+
+        expect {
+          found_disbursement = described_class.new.call(order)
+        }.to change(Disbursement, :count).by(1)
+
+        expect(found_disbursement).not_to eq disbursement
+      end
+    end
+  end
+
   context "when disbursement is found" do
     context "when merchant disbursement frequency is daily" do
       it "returns disbursement found on the order created_at date" do
         merchant = create(:merchant, :daily)
         created_at = Date.parse("2024-02-02")
         order = create(:order, merchant:, created_at:)
-        disbursement = create(:disbursement, merchant:, reference_date: order.created_at.to_date)
+        disbursement = create(:disbursement, :pending, merchant:, reference_date: order.created_at.to_date)
 
         found_disbursement = nil
 
@@ -31,7 +84,7 @@ RSpec.describe ::FindOrCreateDisbursement do
 
         created_at = Date.today + 2.days # next friday
         order = create(:order, merchant:, created_at:)
-        disbursement = create(:disbursement, merchant:, reference_date: Date.today) # wednesday
+        disbursement = create(:disbursement, :pending, merchant:, reference_date: Date.today) # wednesday
 
         found_disbursement = nil
 
@@ -53,7 +106,7 @@ RSpec.describe ::FindOrCreateDisbursement do
 
         created_at = Date.today + 1.week # next wednesday
         order = create(:order, merchant:, created_at:)
-        disbursement = create(:disbursement, merchant:, reference_date: order.created_at.to_date)
+        disbursement = create(:disbursement, :pending, merchant:, reference_date: order.created_at.to_date)
 
         found_disbursement = nil
 
