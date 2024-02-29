@@ -22,6 +22,19 @@ FactoryBot.define do
       frequency { ::Enum::DisbursementFrequencies::WEEKLY }
     end
 
+    trait :pending do
+      status { ::Enum::DisbursementStatuses::PENDING }
+    end
+
+    trait :processing do
+      status { ::Enum::DisbursementStatuses::PROCESSING }
+    end
+
+    trait :calculated do
+      status { ::Enum::DisbursementStatuses::CALCULATED }
+      calculated_at { Time.current }
+    end
+
     trait :with_commissions do
       transient do
         commissions_count { 5 }

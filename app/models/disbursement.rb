@@ -41,4 +41,6 @@ class Disbursement < ApplicationRecord
   validates :merchant, :reference, :status, :frequency, :reference_date, presence: true
   validates :calculated_at, presence: true, if: -> { calculated? }
   validates_uniqueness_of :reference
+
+  scope :pending_or_processing, -> { where(status: [::Enum::DisbursementStatuses::PENDING, ::Enum::DisbursementStatuses::PROCESSING]) }
 end
