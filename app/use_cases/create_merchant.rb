@@ -1,4 +1,4 @@
-class Merchants::Create
+class CreateMerchant
   def call(reference:, email:, live_on:, disbursement_frequency:, minimum_monthly_fee:, id: nil)
     Merchant.create!(
       id: id,

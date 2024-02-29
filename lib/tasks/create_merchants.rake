@@ -27,7 +27,7 @@ task create_merchants: :environment do
       next
     end
 
-    Merchants::Create.new.call(
+    CreateMerchant.new.call(
       id: row["id"],
       reference: row["reference"],
       email: row["email"],
