@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ::Merchants::Create do
+RSpec.describe ::CreateMerchant do
   context "when any attribute is invalid" do
     it "raises an error" do
       expect {
