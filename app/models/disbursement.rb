@@ -43,4 +43,16 @@ class Disbursement < ApplicationRecord
   validates_uniqueness_of :reference
 
   scope :pending_or_processing, -> { where(status: [::Enum::DisbursementStatuses::PENDING, ::Enum::DisbursementStatuses::PROCESSING]) }
+
+  def update_totals_from!(commission)
+    raise "Disbursement already calculated" if calculated?
+
+    commissions << commission
+    self.total_commission_fee += commission.fee_value
+    self.total_amount += commission.order_amount
+    self.disbursed_amount += commission.disbursed_amount
+    self.status = ::Enum::DisbursementStatuses::PROCESSING
+
+    save!
+  end
 end
