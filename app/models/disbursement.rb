@@ -44,6 +44,13 @@ class Disbursement < ApplicationRecord
 
   scope :pending_or_processing, -> { where(status: [::Enum::DisbursementStatuses::PENDING, ::Enum::DisbursementStatuses::PROCESSING]) }
 
+  scope :by_month, ->(month) { where(reference_date: month.beginning_of_month..month.end_of_month) }
+  scope :by_merchant, ->(merchant) { where(merchant: merchant) }
+
+  def first_of_the_month?
+    reference_date.day == 1
+  end
+
   def update_totals_from!(commission)
     raise "Disbursement already calculated" if calculated?
 

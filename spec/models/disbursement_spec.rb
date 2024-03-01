@@ -11,6 +11,40 @@ RSpec.describe Disbursement do
     end
   end
 
+  context "when retrieving disbursements by month" do
+    it "returns disbursements within the month" do
+      this_month = Date.today
+      disbursement = create(:disbursement, reference_date: this_month)
+      _other_disbursement = create(:disbursement, reference_date: this_month.next_month)
+
+      expect(Disbursement.by_month(this_month)).to contain_exactly(disbursement)
+    end
+  end
+
+  context "when retrieving disbursements by merchant" do
+    it "returns disbursements for the merchant" do
+      merchant = create(:merchant)
+      disbursement = create(:disbursement, merchant:)
+      _other_disbursement = create(:disbursement, merchant: create(:merchant))
+
+      expect(Disbursement.by_merchant(merchant)).to contain_exactly(disbursement)
+    end
+  end
+
+  context "when checking if disbursement is the first of the month" do
+    it "returns true if reference date is the first day of the month" do
+      disbursement = build(:disbursement, reference_date: "2024-02-01")
+
+      expect(disbursement).to be_first_of_the_month
+    end
+
+    it "returns false if reference date is not the first day of the month" do
+      disbursement = build(:disbursement, reference_date: "2024-02-02")
+
+      expect(disbursement).not_to be_first_of_the_month
+    end
+  end
+
   context "when updating totals from commission" do
     it "raises error if disbursement is already calculated" do
       disbursement = create(:disbursement, :calculated)
