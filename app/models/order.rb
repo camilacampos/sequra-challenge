@@ -3,6 +3,7 @@ class Order < ApplicationRecord
   monetize :amount_cents
 
   belongs_to :merchant
+  has_many :commissions
 
-  validates_uniqueness_of :reference
+  validates :reference, presence: true, uniqueness: true
 end
