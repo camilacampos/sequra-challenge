@@ -26,23 +26,15 @@ class FindOrCreateDisbursement
 
     return created_at if order.merchant.daily?
 
-    weekday = order.merchant.live_on.wday
-    if created_at.wday == weekday
+    live_on = order.merchant.live_on
+    if wday(created_at) == wday(live_on)
       created_at
     else
-      created_at.prev_occurring(number_to_weekday(weekday))
+      created_at.prev_occurring(wday(live_on))
     end
   end
 
-  def number_to_weekday(number)
-    {
-      1 => :monday,
-      2 => :tuesday,
-      3 => :wednesday,
-      4 => :thursday,
-      5 => :friday,
-      6 => :saturday,
-      7 => :sunday
-    }.fetch(number)
+  def wday(date)
+    date.strftime("%A").downcase.to_sym
   end
 end
