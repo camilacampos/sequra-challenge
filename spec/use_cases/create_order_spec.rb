@@ -62,5 +62,18 @@ RSpec.describe ::CreateOrder do
         expect(order.created_at).to eq Date.parse(created_at)
       end
     end
+
+    it "calculates commission for the order" do
+      reference = "order-reference"
+      amount = Money.from_amount(100)
+      merchant = create(:merchant)
+
+      order = described_class.new.call(
+        reference:, amount:,
+        merchant_reference: merchant.reference
+      )
+
+      expect(order.commissions.count).to eq 1
+    end
   end
 end

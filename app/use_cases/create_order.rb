@@ -20,5 +20,6 @@ class CreateOrder
   end
 
   def calculate_commission(order)
+    ::CalculateCommission.new.call(order:)
   end
 end
