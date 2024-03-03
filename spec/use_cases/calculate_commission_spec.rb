@@ -70,11 +70,9 @@ RSpec.describe ::CalculateCommission do
       described_class.new.call(order:)
 
       order.reload
-      commissions = order.commissions
       disbursement = Disbursement.last
       expect(disbursement).to be_processing
-      expect(commissions.count).to eq(1)
-      expect(disbursement.commissions).to eq(commissions)
+      expect(disbursement.commissions).to contain_exactly(order.commission)
     end
 
     it "updates new disbursement with totals from commission values" do
@@ -85,7 +83,7 @@ RSpec.describe ::CalculateCommission do
       described_class.new.call(order:)
 
       order.reload
-      commission = order.commissions.first
+      commission = order.commission
       disbursement = commission.disbursement
       expect(disbursement).to be_processing
       expect(disbursement.total_commission_fee).to eq(commission.fee_value)
@@ -106,7 +104,7 @@ RSpec.describe ::CalculateCommission do
         }.to raise_error("some error")
 
         order.reload
-        expect(order.commissions).to be_empty
+        expect(order.commission).to be_nil
         expect(Disbursement.count).to eq(0)
       end
     end

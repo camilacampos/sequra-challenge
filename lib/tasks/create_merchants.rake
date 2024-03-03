@@ -19,7 +19,6 @@ task create_merchants: :environment do
   errors = []
 
   data.each do |row|
-    Money.from_amount(row["minimum_monthly_fee"])
     existing_merchant = Merchant.find_by(reference: row["reference"])
     if existing_merchant
       print "."

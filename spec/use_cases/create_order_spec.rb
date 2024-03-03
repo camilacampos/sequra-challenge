@@ -73,7 +73,7 @@ RSpec.describe ::CreateOrder do
         merchant_reference: merchant.reference
       )
 
-      expect(order.commissions.count).to eq 1
+      expect(order.commission).to be_present
     end
   end
 end
