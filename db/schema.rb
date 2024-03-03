@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_29_031757) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_03_220401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -35,11 +35,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_29_031757) do
     t.uuid "merchant_id", null: false
     t.string "reference", null: false
     t.string "status", null: false
-    t.integer "total_commission_fee_cents", default: 0, null: false
+    t.bigint "total_commission_fee_cents", default: 0, null: false
     t.string "total_commission_fee_currency", default: "EUR", null: false
-    t.integer "total_amount_cents", default: 0, null: false
+    t.bigint "total_amount_cents", default: 0, null: false
     t.string "total_amount_currency", default: "EUR", null: false
-    t.integer "disbursed_amount_cents", default: 0, null: false
+    t.bigint "disbursed_amount_cents", default: 0, null: false
     t.string "disbursed_amount_currency", default: "EUR", null: false
     t.integer "monthly_fee_cents"
     t.string "monthly_fee_currency"
@@ -73,6 +73,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_29_031757) do
     t.datetime "updated_at", null: false
     t.index ["merchant_id"], name: "index_orders_on_merchant_id"
     t.index ["reference"], name: "index_orders_on_reference", unique: true
+  end
+
+  create_table "orders_tmp", id: :string, force: :cascade do |t|
+    t.string "merchant_reference", null: false
+    t.string "amount", null: false
+    t.string "created_at", null: false
   end
 
   add_foreign_key "commissions", "disbursements"
