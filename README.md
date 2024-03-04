@@ -41,3 +41,11 @@ make lint-fix # run lint and automatically fix issues
 ## Challenge description
 
 Refer to [challenge_description.md](challenge_description.md)
+
+## Report
+
+| Year | Number of disbursements | Amount disbursed to merchants | Amount of order fees | Number of monthly fees charged (From minimum monthly fee) | Amount of monthly fee charged (From minimum monthly fee) |
+| --- | --- | --- | --- | --- | --- |
+| 2022 | 1548 | 39.173.739,73 € | 350.774,71 € | 1.548 | 212,01 € |
+| 2023 | 10352 | 188.363.118,18 € | 1.692.163,42 € | 10.352 | 1.757,16 € |
+
