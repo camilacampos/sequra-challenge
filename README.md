@@ -141,3 +141,7 @@ As said early in the text, I would use events to trigger the use cases. For inst
 **Monitoring**
 
 In such a critical system, it's important to monitor everything. I would use datadog or new relic to monitor income calls and calculations, to make sure everything is going well and to be able to fix any problems right away.
+
+## Work method
+
+I used a public github repo and open new branchs and PRs for each step of the way. They can be all seen on: https://github.com/camilacampos/sequra-challenge
