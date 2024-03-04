@@ -5,3 +5,9 @@
   - [default, 3]
   - [low, 2]
   - [very_low, 1]
+
+:scheduler:
+  :schedule:
+    finish_disbursements_calculation:
+      cron: "50 19 * * *" # Everyday 7:50 PM
+      class: FinishDisbursementsCalculationJob
