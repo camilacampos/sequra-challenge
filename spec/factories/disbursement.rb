@@ -41,7 +41,7 @@ FactoryBot.define do
       end
 
       after(:create) do |disbursement, evaluator|
-        create_list(:commission, evaluator.commissions_count, disbursement: disbursement)
+        create_list(:commission, evaluator.commissions_count, disbursement:, merchant: disbursement.merchant)
       end
     end
   end

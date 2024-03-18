@@ -145,3 +145,25 @@ In such a critical system, it's important to monitor everything. I would use dat
 ## Work method
 
 I used a public github repo and open new branchs and PRs for each step of the way. They can be all seen on: https://github.com/camilacampos/sequra-challenge
+
+
+## Adding new funcionality
+
+### Refunds
+We need to be able to receive refund requests from any order. The refund amount should be deducted from the current pending or processing disbursement.
+
+The refunds contain:
+- order_id
+- amount
+- date
+
+> :warning: We can assume that the amount given on the refund request is always right.
+
+**Solution**
+
+In order to create the refund requests, we must:
+* find the order/merchant associated with that refund request
+* find the disbursement appropriate for the refund date (considering daily and weekly merchants)
+* deduct the refund amount from that disbursement.
+
+![image](https://github.com/camilacampos/sequra-challenge/assets/2309096/023ae374-0c74-49ff-b42d-fea7bd8f13fc)

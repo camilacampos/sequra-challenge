@@ -6,13 +6,24 @@ task calculate_commissions: :environment do
   calculated_commissions = 0
   errors = []
 
-  Order.left_joins(:commission).where(commission: {id: nil}).find_each do |order|
-    CalculateCommission.new.call(order: order)
-    calculated_commissions += 1
-    print "." if calculated_commissions % 1000 == 0
-  rescue => e
-    print "F"
-    errors << {order_id: order.id, error: e}
+  query = Order.left_joins(:commission).where(commission: {id: nil})
+
+  query.find_in_batches(batch_size: 5) do |batch|  # max connection pools
+    mutex = Mutex.new
+    batch.map do |order|
+      Thread.new do
+        CalculateCommission.new.call(order: order)
+        mutex.synchronize do
+          calculated_commissions += 1
+          print "." if calculated_commissions % 1000 == 0
+        end
+      rescue => e
+        mutex.synchronize do
+          print "F"
+          errors << {order_id: order.id, error: e}
+        end
+      end
+    end.each(&:join)
   end
 
   ending = Process.clock_gettime(Process::CLOCK_MONOTONIC)
